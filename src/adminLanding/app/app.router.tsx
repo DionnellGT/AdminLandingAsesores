@@ -1,4 +1,9 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router"
+import { AuthLayout } from "../auth/layout/AuthLayout"
+import { DashboardLayout } from "../admin/layout/DashboardLayout"
+import { BannerPage, DashboardPage, MisDatosPage, ProyectosPage, SobreMiPage, TestimoniosPage, UsersPage } from "../admin/pages"
+import { LoginPage } from "../auth/pages/LoginPage"
+
 
 
 const appRouter = createBrowserRouter([
@@ -14,8 +19,28 @@ const appRouter = createBrowserRouter([
                 element: <DashboardPage/>
             },
             {
-                path: 'leads',
-                element: <Leads/>
+                path: 'mis-datos',
+                element: <MisDatosPage/>
+            },
+            {
+                path: 'banner',
+                element: <BannerPage/>
+            },
+            {
+                path: 'sobre-mi',
+                element: <SobreMiPage/>
+            },
+            {
+                path: 'proyectos',
+                element: <ProyectosPage/>
+            },
+            {
+                path: 'testimonios',
+                element: <TestimoniosPage/>
+            },
+            {
+                path: 'users',
+                element: <UsersPage/>
             }
         ]
     },
