@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Loader2, Plus, MapPin, Building2 } from "lucide-react";
+import { Loader2, Plus, MapPin, Building2, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,13 +12,18 @@ import {
 } from "@/components/ui/card";
 
 import { useLandingBundle } from "../../landing/hook/useLandingBundle";
+import { ConfirmDialog } from "../../landing/components/ConfirmDialog";
 import { ProyectoFormDialog } from "../proyectos/components/ProyectoFormDialog";
+import { useDeleteProyecto } from "../proyectos/hook/useDeleteProyecto";
 import type { LandingProyecto } from "../../interfaces/landing.interfaces";
 
 export const ProyectosPage = () => {
   const { data: bundle, isLoading } = useLandingBundle();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<LandingProyecto | null>(null);
+  const [deleting, setDeleting] = useState<LandingProyecto | null>(null);
+
+  const { mutate: deleteProyecto, isPending: isDeleting } = useDeleteProyecto();
 
   const openCreate = () => {
     setEditing(null);
@@ -28,6 +33,11 @@ export const ProyectosPage = () => {
   const openEdit = (proyecto: LandingProyecto) => {
     setEditing(proyecto);
     setDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (!deleting) return;
+    deleteProyecto(deleting.id, { onSuccess: () => setDeleting(null) });
   };
 
   if (isLoading) {
@@ -101,9 +111,17 @@ export const ProyectosPage = () => {
                   {proyecto.lotesDisponibles} lote(s)
                 </span>
               </CardContent>
-              <CardFooter className="border-t pt-4">
-                <Button variant="outline" size="sm" className="w-full" onClick={() => openEdit(proyecto)}>
+              <CardFooter className="gap-2 border-t pt-4 pb-4">
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => openEdit(proyecto)}>
                   Editar
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setDeleting(proyecto)}
+                  aria-label={`Eliminar ${proyecto.nombre}`}
+                >
+                  <Trash2 className="size-4" />
                 </Button>
               </CardFooter>
             </Card>
@@ -112,6 +130,15 @@ export const ProyectosPage = () => {
       )}
 
       <ProyectoFormDialog open={dialogOpen} onOpenChange={setDialogOpen} proyecto={editing} />
+
+      <ConfirmDialog
+        open={!!deleting}
+        onOpenChange={(open) => !open && setDeleting(null)}
+        title={`¿Eliminar "${deleting?.nombre}"?`}
+        description="Esta acción no se puede deshacer. También se eliminarán todas sus imágenes de Cloudinary."
+        onConfirm={confirmDelete}
+        isLoading={isDeleting}
+      />
     </div>
   );
 };
